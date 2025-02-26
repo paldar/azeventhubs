@@ -1,4 +1,4 @@
-use azure_core::auth::AccessToken;
+use azure_core::credentials::AccessToken;
 use std::sync::Arc;
 
 use crate::{

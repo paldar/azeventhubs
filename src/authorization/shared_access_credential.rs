@@ -1,6 +1,6 @@
 use std::{sync::Mutex, time::Duration};
 
-use azure_core::auth::{Secret, AccessToken};
+use azure_core::credentials::{Secret, AccessToken};
 
 use super::{
     azure_named_key_credential::AzureNamedKeyCredential,

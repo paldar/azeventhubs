@@ -1,4 +1,4 @@
-use azure_core::auth::{TokenCredential, AccessToken};
+use azure_core::credentials::{TokenCredential, AccessToken};
 
 use super::shared_access_credential::SharedAccessCredential;
 
@@ -87,7 +87,7 @@ impl EventHubTokenCredential {
 cfg_not_wasm32! {
     #[cfg(test)]
     mod tests {
-        use azure_core::auth::Secret;
+        use azure_core::credentials::Secret;
         use time::macros::datetime;
 
         use crate::authorization::{
@@ -102,7 +102,7 @@ cfg_not_wasm32! {
             let token_value = "token";
             let mut mock_credentials = crate::authorization::tests::MockTokenCredential::new();
             let resource = "the resource value";
-            let token_response = azure_core::auth::AccessToken {
+            let token_response = azure_core::credentials::AccessToken {
                 token: Secret::new(token_value),
                 expires_on: datetime!(2015-10-27 00:00:00).assume_utc(),
             };

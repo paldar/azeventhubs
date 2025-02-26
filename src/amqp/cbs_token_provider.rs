@@ -1,4 +1,4 @@
-use azure_core::auth::AccessToken;
+use azure_core::credentials::AccessToken;
 use fe2o3_amqp_cbs::{token::CbsToken, AsyncCbsTokenProvider};
 use fe2o3_amqp_types::primitives::Timestamp;
 use std::{future::Future, sync::Arc};
@@ -102,7 +102,7 @@ mod tests {
         use std::sync::Arc;
         use time::Duration as TimeSpan;
 
-        use azure_core::auth::{Secret, AccessToken};
+        use azure_core::credentials::{Secret, AccessToken};
         use time::{macros::datetime, OffsetDateTime};
 
         use crate::{
