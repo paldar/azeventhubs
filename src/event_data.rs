@@ -1,9 +1,9 @@
 use std::borrow::Cow;
-
+use fe2o3_amqp_types::definitions::SequenceNo;
 use fe2o3_amqp_types::messaging::annotations::AnnotationKey;
-use fe2o3_amqp_types::messaging::{ApplicationProperties, Body, Data, Message, Properties};
+use fe2o3_amqp_types::messaging::{Address, ApplicationProperties, Body, Data, Message, MessageId, Properties};
 use fe2o3_amqp_types::primitives::{OrderedMap, SimpleValue};
-use serde_amqp::primitives::Binary;
+use serde_amqp::primitives::{Binary, Symbol, Timestamp};
 use serde_amqp::Value;
 use time::OffsetDateTime;
 
@@ -18,6 +18,7 @@ use crate::constants::DEFAULT_OFFSET_DATE_TIME;
 /// An Event Hubs event, encapsulating a set of data and its associated metadata.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EventData {
+    /// The AMQP message associated with the event.
     pub amqp_message: Message<Data>,
 }
 
@@ -58,9 +59,60 @@ impl EventData {
         self.amqp_message.set_content_type(content_type)
     }
 
+    /// Application properties associated with the event
     pub fn set_application_properties(&mut self, properties: std::collections::HashMap<String, impl Into<SimpleValue>>) {
         let properties = properties.into_iter().map(|(k, v)| (k, v.into())).collect();
         self.amqp_message.application_properties = Some(ApplicationProperties(properties));
+    }
+
+    /// Sets the message properties associated with the event
+    pub fn set_properties(&mut self, properties: std::collections::HashMap<String, String>) {
+        let mut msg_properties = Properties::builder();
+        for (k, v) in properties {
+            match k.as_str() {
+                "message_id" => {
+                    msg_properties = msg_properties.message_id(v);
+                },
+                "user_id" => {
+                    msg_properties = msg_properties.user_id(Binary::from(v.as_bytes().to_vec()));
+                },
+                "to" => {
+                    msg_properties = msg_properties.to(v);
+                },
+                "subject" => {
+                    msg_properties = msg_properties.subject(v);
+                },
+                "reply_to" => {
+                    msg_properties = msg_properties.reply_to(v);
+                },
+                "correlation_id" => {
+                    msg_properties = msg_properties.correlation_id(v);
+                },
+                "content_type" => {
+                    msg_properties = msg_properties.content_type(v);
+                },
+                "content_encoding" => {
+                    msg_properties = msg_properties.content_encoding(v);
+                },
+                // "absolute_expiry_time" => {
+                //     msg_properties = msg_properties.absolute_expiry_time(v.into());
+                // },
+                // "creation_time" => {
+                //     msg_properties = msg_properties.creation_time(v.into());
+                // },
+                "group_id" => {
+                    msg_properties = msg_properties.group_id(v);
+                },
+                // "group_sequence" => {
+                //     msg_properties = msg_properties.group_sequence(v.into());
+                // },
+                "reply_to_group_id" => {
+                    msg_properties = msg_properties.reply_to_group_id(v);
+                },
+                _ => {}
+            }
+        }
+        self.amqp_message.properties = Some(msg_properties.build());
     }
 
     /// An application-defined value that uniquely identifies the event.  The identifier is
