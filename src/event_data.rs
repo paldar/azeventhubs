@@ -32,15 +32,6 @@ where
     }
 }
 
-impl From<Message<Data>> for EventData
-{
-    fn from(amqp_message: Message<Data>) -> Self {
-        Self {
-            amqp_message,
-        }
-    }
-}
-
 impl EventData {
     /// Creates a new event from the given data
     pub fn new(body: impl Into<Vec<u8>>) -> Self {
@@ -65,6 +56,11 @@ impl EventData {
     /// Sets the content type associated with the event
     pub fn set_content_type(&mut self, content_type: impl Into<Option<String>>) {
         self.amqp_message.set_content_type(content_type)
+    }
+
+    pub fn set_application_properties(&mut self, properties: std::collections::HashMap<String, impl Into<SimpleValue>>) {
+        let properties = properties.into_iter().map(|(k, v)| (k, v.into())).collect();
+        self.amqp_message.application_properties = Some(ApplicationProperties(properties));
     }
 
     /// An application-defined value that uniquely identifies the event.  The identifier is
