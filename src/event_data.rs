@@ -18,7 +18,7 @@ use crate::constants::DEFAULT_OFFSET_DATE_TIME;
 /// An Event Hubs event, encapsulating a set of data and its associated metadata.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EventData {
-    pub(crate) amqp_message: Message<Data>,
+    pub amqp_message: Message<Data>,
 }
 
 impl<T> From<T> for EventData
@@ -28,6 +28,15 @@ where
     fn from(value: T) -> Self {
         Self {
             amqp_message: Message::builder().data(Binary::from(value)).build(),
+        }
+    }
+}
+
+impl From<Message<Data>> for EventData
+{
+    fn from(amqp_message: Message<Data>) -> Self {
+        Self {
+            amqp_message,
         }
     }
 }
